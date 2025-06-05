@@ -1,5 +1,5 @@
-# Jogo da Forca em Python!!!!!!!
-#versão: 1.0.0
+# Jogo da Forca em Python!!!!!!!!!!!!!!!!!!!!!!
+#versão: 2.0.0
 
 import random
 from os import system,name 
@@ -13,6 +13,85 @@ def limpa_tela():
 	else:
 		_= system('clear') 
 
+#Função que desenha a forca na tela
+def mostrar_enforcado(chances):
+	# Lista de estágios da forca
+	stages = [
+	# Estágio 6 (final)
+	'''
+	__________
+	|	 |
+	|	 0
+	|  \\|/
+	|	 |
+	|	/ \\
+	_
+	''''',
+	# Estágio 5
+	'''
+	__________
+	|	 |
+	|	 0
+	|       \\|/	
+	|	 |
+	|	/
+	_
+	''''',
+	''''''
+	# Estágio 4
+	'''
+	__________
+	|	 |
+	|	 0
+	|  	\\|/
+	|	 |
+	|
+	_
+	''''',
+	# Estágio 3
+	'''
+	__________
+	|	 |
+	|	 0
+	|       \\|
+	|	 |
+	|
+	_
+	''''',
+	# Estágio 2
+	'''
+	__________
+	|	 |
+	|	 0
+	|	 |
+	|	 |
+	|
+	_
+	''''',
+	# Estágio 1
+	'''
+	__________
+	|	 |
+	|	 0
+	|
+	|
+	|
+	_
+	''''',
+	# Estágio 0
+	'''
+	__________
+	|        |
+	|
+	|
+	|
+	|
+	_
+	''''',
+]
+	return stages[chances]
+
+# Função do jogo
 def game():
 
 	limpa_tela()
@@ -30,6 +109,7 @@ def game():
 
 	# list comprehension
 	letras_descobertas = ['_' for letra in palavra]
+	tabuleiro = letras_descobertas
 
 	chances = 6
 
@@ -37,8 +117,8 @@ def game():
 
 	while chances > 0:
 
-		print(" ".join(letras_descobertas))
-		print("\nChances restantes:", chances)
+		print(mostrar_enforcado(chances))
+		print("Palavra: ", tabuleiro)
 		print("Letras erradas:"," ".join(letras_erradas))
 
 
@@ -75,4 +155,4 @@ def game():
 # Bloco main
 if __name__ == "__main__":
 	game()
-	print("\nParabéns, você está aprendendo programação em Python com a DSA. :)\n")
+	print("\nParabéns, você está aprendendo programação em Python. :)\n")
