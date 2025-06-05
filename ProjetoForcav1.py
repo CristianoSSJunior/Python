@@ -1,158 +1,188 @@
-# Jogo da Forca em Python!!!!!!!!!!!!!!!!!!!!!!
-#versão: 2.0.0
+# Jogo da Forca em Python!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#versão: 3.0.0
+# Programação Orientada a Objetos
 
+# Import
 import random
-from os import system,name 
+from os import system,name
 
-def limpa_tela():
-	#windows
-	if name == 'nt':
-		_= system('cls')
+# Board (tabuleiro)
+board = ['''
 
-	#Mac ou Linux
-	else:
-		_= system('clear') 
+>>>>>>>>>>Hangman<<<<<<<<<<
 
-#Função que desenha a forca na tela
-def mostrar_enforcado(chances):
-	# Lista de estágios da forca
-	stages = [
-	# Estágio 6 (final)
-	'''
-	__________
-	|	 |
-	|	 0
-	|  \\|/
-	|	 |
-	|	/ \\
-	_
-	''''',
-	# Estágio 5
-	'''
-	__________
-	|	 |
-	|	 0
-	|       \\|/	
-	|	 |
-	|	/
-	_
-	''''',
-	''''''
-	# Estágio 4
-	'''
-	__________
-	|	 |
-	|	 0
-	|  	\\|/
-	|	 |
-	|
-	_
-	''''',
-	# Estágio 3
-	'''
-	__________
-	|	 |
-	|	 0
-	|       \\|
-	|	 |
-	|
-	_
-	''''',
-	# Estágio 2
-	'''
-	__________
-	|	 |
-	|	 0
-	|	 |
-	|	 |
-	|
-	_
-	''''',
-	# Estágio 1
-	'''
-	__________
-	|	 |
-	|	 0
-	|
-	|
-	|
-	_
-	''''',
-	# Estágio 0
-	'''
-	__________
-	|        |
-	|
-	|
-	|
-	|
-	_
-	''''',
-]
-	return stages[chances]
++---+
+|   |
+    |
+    |
+    |
+    |
+=========''', '''
 
-# Função do jogo
-def game():
++---+
+|   |
+O   |
+    |
+    |
+    |
+=========''', '''
 
-	limpa_tela()
-	print("\nEste é o jogo da forca em Python!")
-	print("Adivinhe a palavra abaixo:\n")
++---+
+|   |
+O   |
+|   |
+    |
+    |
+=========''', '''
 
-	print("TEMA: cores\n")
-	print("\n---------------------------\n")
+ +---+
+ |   |
+ O   |
+/|   |
+     |
+     |
+=========''', '''
 
+ +---+
+ |   |
+ O   |
+/|\  |
+     |
+     |
+=========''', '''
 
-	palavras = ['azul','laranja','roxo','rosa','marrom','amarelo','branco','preto',
-	'cinza']
+ +---+ 
+ |   |
+ O   |
+/|\  |
+/    |
+     |
+=========''', '''
 
-	palavra = random.choice(palavras)
+ +---+
+ |   |
+ O   |
+/|\  |
+/ \  |
+     |
+=========''']
 
-	# list comprehension
-	letras_descobertas = ['_' for letra in palavra]
-	tabuleiro = letras_descobertas
+def limpa_tela(self):
+     #windows
+     if name == 'nt':
+           _= system('cls')
 
-	chances = 6
+     #Mac ou Linux
+     else:
+          _= system('clear')
+# Classe
+class Hangman:
 
-	letras_erradas = []
+	# Método Construtor
 
-	while chances > 0:
-
-		print(mostrar_enforcado(chances))
-		print("Palavra: ", tabuleiro)
-		print("Letras erradas:"," ".join(letras_erradas))
-
-
-
-		# Tentativa
-		tentativa = input("Digite uma letra: ").lower()
-		print("\n---------------------------\n")
-
-		# Condicional (1°)
-
-		if tentativa in palavra:
-			index = 0
-			for letra in palavra:
-				if tentativa == letra:
-					letras_descobertas[index] = letra
-				index += 1
-		else:
-			chances -= 1
-			letras_erradas.append(tentativa)
-
-		# Condicional (2°)
-		if "_" not in letras_descobertas:
-			print("\nVocê venceu, a palavra era:", palavra)
-			print("\n---------------------------\n")
-			break
-
+	# Método para adivinhar a letra
+	
+	# Método para verificar se o jogo terminou
 		
+	# Método para verificar se o jogador venceu
+		
+	# Método para não mostrar a letra no board
+		
+	# Método para checar o status do game e imprimir o board na tela
 
-	# Condicional (3°)
-	if "_" in letras_descobertas:
-		print("\nVocê perdeu, a palavra era:", palavra)
-		print("\n---------------------------\n")
+     def __init__(self,palavra):
+          self.palavra = palavra
+          self.letras_erradas = []
+          self.letras_descobertas = []
 
-# Bloco main
+     def adivinhar(self,letra):
+
+          if letra in self.palavra and letra not in self.letras_descobertas:
+               self.letras_descobertas.append(letra)
+
+          elif letra not in self.palavra and letra not in self.letras_erradas:
+               self.letras_erradas.append(letra)
+
+          else:
+               return False
+
+          return True 
+
+     def jogo_terminou(self):
+
+          return self.jogador_venceu() or (len(self.letras_erradas) == 6)
+
+     def jogador_venceu(self):
+          if "_" not in self.hide_words():
+               return True
+          return False
+
+     def hide_words(self):
+          rtn = ''
+
+          for letra in self.palavra:
+               if letra not in self.letras_descobertas:
+                    rtn += '_'
+               else:
+                    rtn += letra
+          return rtn
+
+     # Método para
+     def print_game_status(self):
+
+          print(board[len(self.letras_erradas)])
+
+          print('\nPalavra: ' + self.hide_words())
+
+          print('\nLetras erradas: ',)           
+
+          for letra in self.letras_erradas:
+               print(letra,)
+
+          print ()
+
+          print('Letras corretas: ',)
+
+          for letra in self.letras_descobertas:
+               print(letra,)
+
+          print('\n----------------------------------')     
+
+          print()
+
+def random_word():
+     palavras = ['azul','laranja','roxo','rosa','marrom','amarelo','branco','preto',
+     'cinza']
+
+     palavra = random.choice(palavras)
+     return palavra
+
+def main():
+
+     limpa_tela('self')
+
+     game = Hangman(random_word())
+
+     while not game.jogo_terminou():
+          game.print_game_status()
+
+          # Recebe input do terminal
+          user_input = input('\nDigite uma letra: ')
+
+          game.adivinhar(user_input)
+
+     game.print_game_status()
+
+     # De acordo com os status, imprime mensagem na tela para o usuário
+     if game.jogador_venceu():
+          print('\nParabéns! Você venceu!!')
+
+     else:
+          print('\nGame over! Você perdeu.')
+          print('A palavra era ' + game.palavra)
+
+     print('\nFoi bom jogar com você! Agora estude mais!\n')
+
+#Executa o programa
 if __name__ == "__main__":
-	game()
-	print("\nParabéns, você está aprendendo programação em Python. :)\n")
+     main()
