@@ -17,10 +17,9 @@ def r(valor1):
 def d(valor2):
    valorfinal2 = valor2 / cotad
    return valorfinal2
- 
 
 limpa_tela('self')
-cotad = float(5.58)
+cotad = float(5.56)
 
 print("Se você quiser converter do Dólar para o Real, digite 1. \nCaso queira converter do Real para o Dólar, digite 2.\n")
 opcao = int(input(':'))
@@ -30,16 +29,16 @@ if(opcao ==1):
      print("Converter Dólar($) -> Real(R$).\nDigite o valor em real:")
      valor1 = float(input())
      if(valor1 >= 2):
-          print(valor1,' reais valem ',d(valor1), ' dólares.')
+          print(f'{valor1:.1f} reais valem {d(valor1):.2f} dólares.')
      elif(valor1 <= 1):
-         print(valor1, ', real vale ',d(valor1),' dólares.')
+         print(f'{valor1:.1f} real vale {d(valor1):.2f} dólares.')
           
 
 elif(opcao ==2):
      print("Converter Real(R$) -> Dólar($).\nDigite o valor em dólar:")
      valor2 = float(input())
      if(valor2 <= 1):
-          print('{:.2f} dólar vale {:.2f} reais.'.format(r(valor2)))
+          print(f'{valor2:.1f} dólar vale {r(valor2):.2f} reais.')
      elif(valor2 >= 2):
-          print(valor2,' dólares valem ',r(valor2),' reais.')     
+          print(f'{valor2:.1f} dólares valem {r(valor2):.2f} reais.')     
 
