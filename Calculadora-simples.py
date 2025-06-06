@@ -1,3 +1,14 @@
+from os import system,name
+
+def limpa_tela(self):
+     #windows
+     if name == 'nt':
+           _= system('cls')
+
+     #Mac ou Linux
+     else:
+          _= system('clear')
+
 def soma(num1,num2): 
 	resulSoma = num1 + num2
 	return resulSoma
@@ -23,7 +34,7 @@ print("\n--------------- Calculadora em Python ---------------")
 
 deNovo = 'y'
 while deNovo == 'y':
-
+	limpa_tela('self')
 	while True:
 		try:
 			print("\nSelecione a operação matemática desejada: ")
