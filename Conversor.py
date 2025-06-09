@@ -9,7 +9,6 @@ def limpa_tela(self):
      else:
           _= system('clear')
 
-
 def r(valor1):
     valorfinal =  valor1 * cotad
     return valorfinal
@@ -31,8 +30,7 @@ if(opcao ==1):
      if(valor1 >= 2):
           print(f'{valor1:.1f} reais valem {d(valor1):.2f} dólares.')
      elif(valor1 <= 1):
-         print(f'{valor1:.1f} real vale {d(valor1):.2f} dólares.')
-          
+         print(f'{valor1:.1f} real vale {d(valor1):.2f} dólares.')      
 
 elif(opcao ==2):
      print("Converter Real(R$) -> Dólar($).\nDigite o valor em dólar:")
