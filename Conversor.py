@@ -1,6 +1,6 @@
 from os import system,name
 
-def limpa_tela(self):
+def limpa_tela():
      #windows
      if name == 'nt':
            _= system('cls')
@@ -9,34 +9,54 @@ def limpa_tela(self):
      else:
           _= system('clear')
 
-def r(valor1):
-    valorfinal =  valor1 * cotad
-    return valorfinal
+def r(valor_real,cotad):
+    return valor_real * cotad
     
-def d(valor2):
-   valorfinal2 = valor2 / cotad
-   return valorfinal2
+def d(valor_dolar,cotad):
+     return valor_dolar / cotad
 
-limpa_tela('self')
-cotad = float(5.56)
+deNovo = 'y'
+while deNovo == 'y':
+     while True:
+          try:
 
-print("Se você quiser converter do Dólar para o Real, digite 1. \nCaso queira converter do Real para o Dólar, digite 2.\n")
-opcao = int(input(':'))
-print('\n')
+               limpa_tela()
+               cotad = float(5.56)
+               print("Se você quiser converter do Dólar para o Real, digite 1. \nCaso queira converter do Real para o Dólar, digite 2.\n")
+               opcao = int(input(':'))
 
-if(opcao ==1):
-     print("Converter Dólar($) -> Real(R$).\nDigite o valor em real:")
-     valor1 = float(input())
-     if(valor1 >= 2):
-          print(f'{valor1:.1f} reais valem {d(valor1):.2f} dólares.')
-     elif(valor1 <= 1):
-         print(f'{valor1:.1f} real vale {d(valor1):.2f} dólares.')      
+               if(opcao == 1):
+                    print("\nConverter Dólar($) -> Real(R$).\nDigite o valor em dólar:\n")
+                    valor_dolar = float(input())
+                    if(valor_dolar >= 2):
+                         print(f'\n${valor_dolar:.1f} dólares valem R${r(valor_dolar,cotad):.2f} reais.')
+                    elif(valor_dolar <= 1):
+                         print(f'\n${valor_dolar:.1f} dólar vale R${r(valor_dolar,cotad):.2f} reais.')      
 
-elif(opcao ==2):
-     print("Converter Real(R$) -> Dólar($).\nDigite o valor em dólar:")
-     valor2 = float(input())
-     if(valor2 <= 1):
-          print(f'{valor2:.1f} dólar vale {r(valor2):.2f} reais.')
-     elif(valor2 >= 2):
-          print(f'{valor2:.1f} dólares valem {r(valor2):.2f} reais.')     
+               elif (opcao == 2):
+                    print("\nConverter Real(R$) -> Dólar($).\nDigite o valor em real:\n")
+                    valor_real = float(input())
+                    if(valor_real <= 1):
+                         print(f'\nR${valor_real:.1f} real vale ${d(valor_real,cotad):.2f} dólares.')
+                    elif(valor_real >= 2):
+                         print(f'\nR${valor_real:.1f} reais valem ${d(valor_real,cotad):.2f} dólares.')  
 
+               else:
+                    print("\nOpção inválida.")
+                    continue
+
+               break
+          
+          except ValueError:
+               print("\nEntrada inválida. Tente novamente")
+     
+     deNovo = (input("\nQuer converter novamente?(y/n):")).lower()
+     if deNovo not in ('y', 'n'):
+          print('Opção inválida. Tente novamente.')
+          deNovo = 'y'
+     elif deNovo == 'n':
+          break
+               
+                    
+          
+     
