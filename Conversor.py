@@ -1,39 +1,32 @@
 #Data: 18/06/2025
-from os import system,name
+import os
 import requests
 
 def limpa_tela():
-     #windows
-     if name == 'nt':
-           _= system('cls')
-
-     #Mac ou Linux
-     else:
-          _= system('clear')
-
+     os.system('cls' if os.name == 'nt' else 'clear')
+ 
 #Funções para a conversão
-def r(valor_real,cotacao):
+def converter_real(valor_real: float,cotacao: float) -> float: 
     return valor_real * cotacao
     
-def d(valor_dolar,cotacao):
+def converter_dolar(valor_dolar,cotacao):
      return valor_dolar / cotacao
 
 def obter_opcao():
      while True:
-               limpa_tela()
-               print("1- Se você quiser converter do Dólar($) para o Real. \n2- Caso queira converter do Real(R$) para o Dólar.\n")
-               opcao = (input('Digite 1 ou 2: ')).strip()
-               if opcao in ('1','2'):
-                    return int(opcao)
-               print("Opção inválida. Tente novamente.\n")
+          limpa_tela()
+          print("1- Se você quiser converter do Dólar($) para o Real(R$)")
+          print("2- Se você quiser converter do Real(R$) para o Dólar($)\n")
+          opcao = input('Digite 1 ou 2: ').strip()
+          if opcao in ('1','2'):
+               return int(opcao)
+          print("Opção inválida. Tente novamente.\n")
 
 def converter(opcao):
      while True:
           try:
-
                print('\n------------------------|**|----------------------------')
-               #Valor da cota do dólar:
-               cotacao = obter_cotacao()
+               cotacao = obter_cotacao() #Valor da cota do dólar:
                print(f"\nA cotação atual do dólar é de R${cotacao:.2f}")
 
                #Variável para converter dólar para Real
@@ -41,18 +34,18 @@ def converter(opcao):
                     print("\nConverter Dólar($) -> Real(R$).\nDigite o valor em dólar:\n")
                     valor_dolar = float(input('$'))
                     if(valor_dolar >= 2):
-                         print(f'\n${valor_dolar:.2f} dólares valem R${r(valor_dolar,cotacao):.2f} reais.')
+                         print(f'\n${valor_dolar:.2f} dólares valem R${converter_real(valor_dolar,cotacao):.2f} reais.')
                     elif(valor_dolar <= 1):
-                         print(f'\n${valor_dolar:.2f} dólar vale R${r(valor_dolar,cotacao):.2f} reais.')      
+                         print(f'\n${valor_dolar:.2f} dólar vale R${converter_real(valor_dolar,cotacao):.2f} reais.')      
 
                     #Variável para converter Real para dólar.
                elif (opcao == 2):
                          print("\nConverter Real(R$) -> Dólar($).\nDigite o valor em real:\n")
                          valor_real = float(input('R$'))
                          if(valor_real <= 1):
-                              print(f'\nR${valor_real:.2f} real vale ${d(valor_real,cotacao):.2f} dólares.')
+                              print(f'\nR${valor_real:.2f} real vale ${converter_dolar(valor_real,cotacao):.2f} dólares.')
                          elif(valor_real >= 2):
-                              print(f'\nR${valor_real:.2f} reais valem ${d(valor_real,cotacao):.2f} dólares.')  
+                              print(f'\nR${valor_real:.2f} reais valem ${converter_dolar(valor_real,cotacao):.2f} dólares.')  
 
                else:
                          print("\nOpção inválida.")
@@ -64,37 +57,30 @@ def converter(opcao):
 
 def obter_cotacao():
      try:
-            resposta = requests.get("https://economia.awesomeapi.com.br/json/last/USD-BRL")
-            resposta.raise_for_status()
-            cotacao = float(resposta.json()['USDBRL']['bid'])
-            return cotacao
+          resposta = requests.get("https://economia.awesomeapi.com.br/json/last/USD-BRL")
+          resposta.raise_for_status()
+          return float(resposta.json()['USDBRL']['bid'])
      except Exception as e:
-           print(f'Erro ao obter cotação: {e}')
-           return 5.5
+          print(f'Erro ao obter cotação: {e}')
+          return 5.5 # Valor padrão em caso de falha na requisição
 
 #Função do conversor
 def main():
-
      deNovo = 'y'
      while deNovo == 'y':
 
-          #Função para limpar a tela.
-          limpa_tela()
+          limpa_tela() #Função para limpar a tela.
 
-          #Função para obter uma opção.
-          opcao = obter_opcao()
+          opcao = obter_opcao() #Função para obter uma opção.
 
-          #Função para converter os valores.
-          converter(opcao)
+          converter(opcao) #Função para converter os valores.
 
-          #Opção para repetir ou não
-          deNovo = (input("\nQuer converter novamente?(y/n): ")).lower()
-          if deNovo not in ('y', 'n'):
-               print('Opção inválida. Tente novamente.')
-               deNovo = 'y'
-          elif deNovo == 'n':
-               break
+          while True:
+               deNovo = input("\nQuer converter novamente? (y/n): ").strip().lower()
+               if deNovo in ('y', 'n'):
+                    break
+               print('\nOpção inválida. Tente novamente.')
 
 #Executa o conversor:
 if __name__ == '__main__':
-          main()
+     main()
