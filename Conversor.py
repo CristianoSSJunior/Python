@@ -84,3 +84,4 @@ def main():
 #Executa o conversor:
 if __name__ == '__main__':
      main()
+#FINALIZADO dia 18/06/2025
