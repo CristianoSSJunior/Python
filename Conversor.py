@@ -1,5 +1,6 @@
-#Data: 16/06/2025
+#Data: 18/06/2025
 from os import system,name
+import requests
 
 def limpa_tela():
      #windows
@@ -32,7 +33,8 @@ def converter(opcao):
 
                print('\n------------------------|**|----------------------------')
                #Valor da cota do dólar:
-               cotacao = float(5.5)
+               cotacao = obter_cotacao()
+               print(f"\nA cotação atual do dólar é de R${cotacao:.2f}")
 
                #Variável para converter dólar para Real
                if(opcao == 1):
@@ -55,11 +57,20 @@ def converter(opcao):
                else:
                          print("\nOpção inválida.")
                          continue
-
                break
           
           except ValueError:
                print("\nEntrada inválida. Tente novamente")
+
+def obter_cotacao():
+     try:
+            resposta = requests.get("https://economia.awesomeapi.com.br/json/last/USD-BRL")
+            resposta.raise_for_status()
+            cotacao = float(resposta.json()['USDBRL']['bid'])
+            return cotacao
+     except Exception as e:
+           print(f'Erro ao obter cotação: {e}')
+           return 5.5
 
 #Função do conversor
 def main():
@@ -76,6 +87,7 @@ def main():
           #Função para converter os valores.
           converter(opcao)
 
+          #Opção para repetir ou não
           deNovo = (input("\nQuer converter novamente?(y/n): ")).lower()
           if deNovo not in ('y', 'n'):
                print('Opção inválida. Tente novamente.')
