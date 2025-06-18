@@ -53,7 +53,7 @@ def converter(opcao):
                break
           
           except ValueError:
-               print("\nEntrada inválida. Tente novamente")
+               print("\nEntrada inválida. Tente novamente.")
 
 def obter_cotacao():
      try:
