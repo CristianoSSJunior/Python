@@ -38,20 +38,15 @@ def converter(opcao):
                     elif(valor_dolar <= 1):
                          print(f'\n${valor_dolar:.2f} dólar vale R${converter_real(valor_dolar,cotacao):.2f} reais.')      
 
-                    #Variável para converter Real para dólar.
-               elif (opcao == 2):
-                         print("\nConverter Real(R$) -> Dólar($).\nDigite o valor em real:\n")
-                         valor_real = float(input('R$'))
-                         if(valor_real <= 1):
-                              print(f'\nR${valor_real:.2f} real vale ${converter_dolar(valor_real,cotacao):.2f} dólares.')
-                         elif(valor_real >= 2):
-                              print(f'\nR${valor_real:.2f} reais valem ${converter_dolar(valor_real,cotacao):.2f} dólares.')  
-
+               #Variável para converter Real para dólar.
                else:
-                         print("\nOpção inválida.")
-                         continue
+                    print("\nConverter Real(R$) -> Dólar($).\nDigite o valor em real:\n")
+                    valor_real = float(input('R$'))
+                    if(valor_real <= 1):
+                         print(f'\nR${valor_real:.2f} real vale ${converter_dolar(valor_real,cotacao):.2f} dólares.')
+                    elif(valor_real >= 2):
+                         print(f'\nR${valor_real:.2f} reais valem ${converter_dolar(valor_real,cotacao):.2f} dólares.')  
                break
-          
           except ValueError:
                print("\nEntrada inválida. Tente novamente.")
 
