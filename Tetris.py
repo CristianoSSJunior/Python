@@ -277,7 +277,7 @@ def draw_window(surface, grid, score=0, lines=0, level=1):
     font = pygame.font.SysFont('comicsans', 30)
     surface.blit(font.render('Score: ' + str(score), 1, (255,255,255)),
         (top_left_x - 200, top_left_y + 200))
-    surface.blit(font.render('Lines:' + str(lines), 1, (255, 255, 255)),
+    surface.blit(font.render('Lines: ' + str(lines), 1, (255, 255, 255)),
         (top_left_x - 200, top_left_y + 250))
     surface.blit(font.render('Level: ' + str(level), 1, (255, 255, 255)),
         (top_left_x - 200, top_left_y + 300))
@@ -285,8 +285,6 @@ def draw_window(surface, grid, score=0, lines=0, level=1):
 
     sx = top_left_x + play_width + 50
     sy = top_left_y + (play_height / 2 - 100)
-
-    surface.blit(label, (sx + 10, sy + 160))
 
     #Game grid
     for i in range(len(grid)):
@@ -298,7 +296,6 @@ def draw_window(surface, grid, score=0, lines=0, level=1):
                 (top_left_x, top_left_y, play_width, play_height), 5)
     
     draw_grid(surface, grid)
-    pygame.display.update()
 
 # --- Main Game Loop ---
 def main(win):
@@ -306,10 +303,9 @@ def main(win):
     grid = create_grid(locked_positions)
 
     # Delay Lock
-    delay = 500  # milliseconds
+    lock_delay = 500  # milliseconds
     lock_time = 0
     last_move_time = pygame.time.get_ticks()
-
 
     change_piece = False
     run = True
@@ -338,9 +334,14 @@ def main(win):
             current_piece.y += 1
             if not (valid_space(current_piece, grid)) and current_piece.y > 0:
                 current_piece.y -= 1
-                change_piece = True
+                # Lock delay
+                lock_time += clock.get_rawtime()
+                if lock_time >= lock_delay:
+                    change_piece = True
+                else:
+                    lock_time = 0
 
-        # User input
+        # ---- User input ----
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -350,7 +351,7 @@ def main(win):
                     current_piece.x -= 1
                     if not valid_space(current_piece, grid):
                         current_piece.x += 1
-
+                    
                 elif event.key == pygame.K_RIGHT:
                     current_piece.x += 1
                     if not valid_space(current_piece, grid):
@@ -367,13 +368,16 @@ def main(win):
                     current_piece.rotation = (current_piece.rotation + 1) % len(current_piece.shape)
                     if not valid_space(current_piece, grid):
                         current_piece.rotation = (current_piece.rotation -1) % len(current_piece.shape)
-                
+
                 # Hard drop
                 elif event.key == pygame.K_SPACE:
                     while valid_space(current_piece, grid):
                         current_piece.y += 1
                     current_piece.y -= 1
                     change_piece = True
+
+                elif event.key in [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_DOWN, pygame.K_UP]:
+                    lock_time = 0  # reset lock time on movement
 
         shape_pos = convert_shape_format(current_piece)
 
@@ -399,7 +403,7 @@ def main(win):
             next_piece = get_shape()
             change_piece = False
 
-        draw_window(win, grid, score, level, lines_cleared)
+        draw_window(win, grid, score, lines_cleared, level)
         draw_next_shape(next_piece, win)
         pygame.display.update()
 
