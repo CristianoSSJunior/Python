@@ -33,108 +33,31 @@ top_left_y = s_height - play_height
  
  
 # SHAPE FORMATS
- 
-S = [['.....',
-      '......',
-      '..00..',
-      '.00...',
-      '.....'],
-     ['.....',
-      '..0..',
-      '..00.',
-      '...0.',
-      '.....']]
- 
-Z = [['.....',
-      '.....',
-      '.00..',
-      '..00.',
-      '.....'],
-     ['.....',
-      '..0..',
-      '.00..',
-      '.0...',
-      '.....']]
+S = [['.....', '.....', '..00..', '.00...', '.....'],
+['.....', '..0..', '..00.', '...0.', '.....']]
 
-I = [['..0..',
-      '..0..',
-      '..0..',
-      '..0..',
-      '.....'],
-     ['.....',
-      '0000.',
-      '.....',
-      '.....',
-      '.....']]
+Z = [['.....', '.....', '.00..', '..00.', '.....'],
+['.....', '..0..', '.00..', '.0...', '.....']]
 
-O = [['.....',
-      '.....',
-      '.00..',
-      '.00..',
-      '.....']]
+I = [['..0..', '..0..', '..0..', '..0..', '.....'],
+['.....', '0000.', '.....', '.....', '.....']]
 
-J = [['.....',
-      '.0...',
-      '.000.',
-      '.....',
-      '.....'],
-     ['.....',
-      '..00.',
-      '..0..',
-      '..0..',
-      '.....'],
-     ['.....',
-      '.....',
-      '.000.',
-      '...0.',
-      '.....'],
-     ['.....',
-      '..0..',
-      '..0..',
-      '.00..',
-      '.....']]
+O = [['.....', '.....', '.00..', '.00..', '.....']]
 
-L = [['.....',
-      '...0.',
-      '.000.',
-      '.....',
-      '.....'],
-     ['.....',
-      '..0..',
-      '..0..',
-      '..00.',
-      '.....'],
-     ['.....',
-      '.....',
-      '.000.',
-      '.0...',
-      '.....'],
-     ['.....',
-      '.00..',
-      '..0..',
-      '..0..',
-      '.....']]
+J = [['.....', '.0...', '.000.', '.....', '.....'],
+['.....', '..00.', '..0..', '..0..', '.....'],
+['.....', '.....', '.000.', '...0.', '.....'],
+['.....', '..0..', '..0..', '.00..', '.....']]
 
-T = [['.....',
-      '..0..',
-      '.000.',
-      '.....',
-      '.....'],
-     ['.....',
-      '..0..',
-      '..00.',
-      '..0..',
-      '.....'],
-     ['.....',
-      '.....',
-      '.000.',
-      '..0..',
-      '.....'],
-     ['.....',
-      '..0..',
-      '.00..',
-      '..0..',
-      '.....']]
+L = [['.....', '...0.', '.000.', '.....', '.....'],
+['.....', '..0..', '..0..', '..00.', '.....'],
+['.....', '.....', '.000.', '.0...', '.....'],
+['.....', '.00..', '..0..', '..0..', '.....']]
+
+T = [['.....', '..0..', '.000.', '.....', '.....'],
+['.....', '..0..', '..00.', '..0..', '.....'],
+['.....', '.....', '.000.', '..0..', '.....'],
+['.....', '..0..', '.00..', '..0..', '.....']]
  
 shapes = [S, Z, I, O, J, L, T]
 shape_colors = [(0, 255, 0), (255, 0, 0), (0, 255, 255), (255, 255, 0), (255, 165, 0), (0, 0, 255), (128, 0, 128)]
@@ -155,15 +78,6 @@ class Piece(object):
         self.rotation = 0
 
 # -- Functions --
-def locked_positions(positions):
-    locked = {}
-    for pos in positions:
-        x, y = pos
-        if y >= 0:  # only lock positions that are above the bottom of the grid
-            locked[(x, y)] = positions[pos]
-    return locked
-
- 
 def create_grid(locked_positions={}):
     grid = [[(0, 0, 0) for _ in range(10)] for _ in range(20)]
     for y in range(len(grid)):
@@ -209,7 +123,6 @@ def check_lost(locked_positions):
 def get_shape():
     shape = random.choice(shapes)
     return Piece(5, 0, shape)
- 
  
 def draw_text_middle(text, size, color, surface):
     font = pygame.font.SysFont('comicsans', size, bold=True)
@@ -297,6 +210,24 @@ def draw_window(surface, grid, score=0, lines=0, level=1):
     
     draw_grid(surface, grid)
 
+def draw_ghost(piece, grid, surface):
+    ghost = Piece(piece.x, piece.y, piece.shape)
+    ghost.rotation = piece.rotation
+    while valid_space(ghost, grid):
+        ghost.y += 1
+    ghost.y -= 1  # Move back to last valid position
+
+    ghost_pos = convert_shape_format(ghost)
+    
+    r,g,b = piece.color
+    ghost_surface = pygame.Surface((30,30), pygame.SRCALPHA)  # Create a surface with alpha channel
+    ghost_surface.fill((r, g, b, 80))  # Fill with color
+
+    for pos in ghost_pos:
+        x, y = pos
+        if y > -1:
+            surface.blit(ghost_surface, (top_left_x + x * 30, top_left_y + y * 30))
+
 # --- Main Game Loop ---
 def main(win):
     locked_positions = {}
@@ -304,8 +235,7 @@ def main(win):
 
     # Delay Lock
     lock_delay = 500  # milliseconds
-    lock_time = 0
-    last_move_time = pygame.time.get_ticks()
+    lock_start = None
 
     change_piece = False
     run = True
@@ -319,7 +249,6 @@ def main(win):
     # scoring system
     lines_cleared = 0
     score = 0
-    
     # Points system, from Official Tetris
     points = {0:0, 1:100, 2:300, 3:500, 4:800}
 
@@ -328,46 +257,56 @@ def main(win):
         fall_time += clock.get_rawtime()
         clock.tick()
 
-        # Peaces fall faster over time 
+        # --- PIECE FALLING LOGIC ---
         if fall_time / 1000 >= fall_speed:
             fall_time = 0
             current_piece.y += 1
             if not (valid_space(current_piece, grid)) and current_piece.y > 0:
                 current_piece.y -= 1
                 # Lock delay
-                lock_time += clock.get_rawtime()
-                if lock_time >= lock_delay:
+                if lock_start is None:
+                    lock_start = pygame.time.get_ticks()
+                elif pygame.time.get_ticks() - lock_start >= lock_delay:
                     change_piece = True
-                else:
-                    lock_time = 0
-
+            else:
+                lock_start = None
+                
         # ---- User input ----
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 pygame.display.quit()
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     current_piece.x -= 1
                     if not valid_space(current_piece, grid):
                         current_piece.x += 1
+                    else:
+                        lock_start = None
                     
                 elif event.key == pygame.K_RIGHT:
                     current_piece.x += 1
                     if not valid_space(current_piece, grid):
                         current_piece.x -= 1
+                    else:
+                        lock_start = None
 
                 # Soft drop
                 elif event.key == pygame.K_DOWN:
                     current_piece.y += 1
                     if not valid_space(current_piece, grid):
                         current_piece.y -= 1
+                    else:
+                        lock_start = None
 
                 # Rotate shape
                 elif event.key == pygame.K_UP:
                     current_piece.rotation = (current_piece.rotation + 1) % len(current_piece.shape)
                     if not valid_space(current_piece, grid):
                         current_piece.rotation = (current_piece.rotation -1) % len(current_piece.shape)
+                    else:
+                        lock_start = None
 
                 # Hard drop
                 elif event.key == pygame.K_SPACE:
@@ -377,14 +316,22 @@ def main(win):
                     change_piece = True
 
                 elif event.key in [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_DOWN, pygame.K_UP]:
-                    lock_time = 0  # reset lock time on movement
+                    if valid_space(current_piece, grid):
+                        lock_start = None
+
+        # ---- Drawing the window ----
+        draw_window(win, grid, score, lines_cleared, level)
+        draw_next_shape(next_piece, win)
+
+        draw_ghost(current_piece, grid, win)
 
         shape_pos = convert_shape_format(current_piece)
+        for x, y in shape_pos:
+            if y > -1:
+                pygame.draw.rect(win, current_piece.color,
+                         (top_left_x + x*30, top_left_y + y*30, 30, 30), 0)
 
-        for i in range(len(shape_pos)):
-            x, y = shape_pos[i]
-            if y > -1: # remove after, to test without it
-                grid[y][x] = current_piece.color
+        pygame.display.update()
 
         if change_piece:
             for pos in shape_pos:
@@ -402,11 +349,9 @@ def main(win):
             current_piece = next_piece
             next_piece = get_shape()
             change_piece = False
+            lock_start = None
 
-        draw_window(win, grid, score, lines_cleared, level)
-        draw_next_shape(next_piece, win)
-        pygame.display.update()
-
+        # Check if user lost
         if check_lost(locked_positions):
             draw_text_middle('You Lost!', 80, (255, 0, 0), win)
             pygame.display.update()
