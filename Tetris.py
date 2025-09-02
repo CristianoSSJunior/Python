@@ -96,7 +96,6 @@ def convert_shape_format(shape):
         for j, column in enumerate(row):
             if column == '0':
                 positions.append((shape.x + j - 2, shape.y + i - 4))
-
     return positions
  
 def valid_space(shape, grid):
@@ -162,7 +161,6 @@ def clear_rows(grid, locked):
                 locked[newKey] = locked.pop(key)
     return inc
 
- 
 def draw_next_shape(shape, surface):
     font = pygame.font.SysFont('comicsans', 30)
     label = font.render('Next Shape', 1, (255,255,255))
@@ -177,6 +175,22 @@ def draw_next_shape(shape, surface):
                 pygame.draw.rect(surface, shape.color, (sx + j*30, sy + i*30, 30, 30), 0)
     
     surface.blit(label, (sx + 10, sy - 30))
+
+def draw_hold_shape(shape, surface):
+    font = pygame.font.SysFont('comicsans', 30)
+    label = font.render('Hold', 1, (255,255,255))
+
+    sx = top_left_x - 200 
+    sy = top_left_y + 100
+    surface.blit(label, (sx + 20, sy - 30))
+    if shape:
+        format = shape.shape[shape.rotation % len(shape.shape)]
+        for i, line in enumerate(format):
+            row = list(line)
+            for j, column in enumerate(row):
+                if column == '0':
+                    pygame.draw.rect(surface, shape.color, (sx + j*30, sy + i*30, 30, 30), 0)
+    
 
 def draw_window(surface, grid, score=0, lines=0, level=1):
     surface.fill((0,0,0))
@@ -228,6 +242,18 @@ def draw_ghost(piece, grid, surface):
         if y > -1:
             surface.blit(ghost_surface, (top_left_x + x * 30, top_left_y + y * 30))
 
+def hold_piece(current, hold, can_hold):
+    if not can_hold:
+        return current, hold, False
+
+    if hold is None:
+        hold = current
+        current = get_shape()
+    else:
+        current, hold = hold, current
+        hold.x, hold.y = 5, 0  # Reset position of held piece
+    return current, hold, False
+    
 # --- Main Game Loop ---
 def main(win):
     locked_positions = {}
@@ -241,6 +267,8 @@ def main(win):
     run = True
     current_piece = get_shape()
     next_piece = get_shape()
+    hold_piece_var = None
+    can_hold = True
     clock = pygame.time.Clock()
     fall_time = 0
     fall_speed = 0.27
@@ -290,6 +318,7 @@ def main(win):
                     if not valid_space(current_piece, grid):
                         current_piece.x -= 1
                     else:
+                        score += 1
                         lock_start = None
 
                 # Soft drop
@@ -298,6 +327,7 @@ def main(win):
                     if not valid_space(current_piece, grid):
                         current_piece.y -= 1
                     else:
+                        score += 1
                         lock_start = None
 
                 # Rotate shape
@@ -312,17 +342,18 @@ def main(win):
                 elif event.key == pygame.K_SPACE:
                     while valid_space(current_piece, grid):
                         current_piece.y += 1
+                        score += 2
                     current_piece.y -= 1
                     change_piece = True
 
-                elif event.key in [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_DOWN, pygame.K_UP]:
-                    if valid_space(current_piece, grid):
-                        lock_start = None
+                # Hold piece
+                elif event.key == pygame.K_c:
+                    current_piece, hold_piece_var, can_hold = hold_piece(current_piece, hold_piece_var, can_hold)
 
         # ---- Drawing the window ----
         draw_window(win, grid, score, lines_cleared, level)
         draw_next_shape(next_piece, win)
-
+        draw_hold_shape(hold_piece_var, win)
         draw_ghost(current_piece, grid, win)
 
         shape_pos = convert_shape_format(current_piece)
@@ -370,7 +401,6 @@ def main_menu(win):
                 run = False
             if event.type == pygame.KEYDOWN:
                 main(win)
-
     pygame.quit()
 
 # --- Start Game ---
