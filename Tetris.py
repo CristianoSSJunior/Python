@@ -381,6 +381,7 @@ def main(win):
             next_piece = get_shape()
             change_piece = False
             lock_start = None
+            can_hold = True
 
         # Check if user lost
         if check_lost(locked_positions):
